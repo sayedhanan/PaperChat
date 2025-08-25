@@ -2,7 +2,6 @@ import { PineconeStore } from "@langchain/pinecone";
 import { index } from "./pinecone";
 import { PINECONE_NAMESPACE_ABSTRACT, PINECONE_NAMESPACE_COMPLETE } from "./config";
 import embeddingModel from "./embeddingModel";
-import { Search } from "lucide-react";
 
 // Abstract retriever
 export const abstractStoreRetriever = async () => {
@@ -17,14 +16,14 @@ export const abstractStoreRetriever = async () => {
 };
 
 // Complete retriever (filtered later by id)
-export const completeStoreRetriever = async (paperId?: number) => {
+export const completeStoreRetriever = async (paperId) => {
   const store = await PineconeStore.fromExistingIndex(embeddingModel, {
     pineconeIndex: index,
     namespace: PINECONE_NAMESPACE_COMPLETE,
   });
  
-  const retrieverConfig: any = {
-    SearchType: "similarity",
+  const retrieverConfig = {
+    searchType: "similarity",
     k: 2
   }
 

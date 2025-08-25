@@ -5,7 +5,7 @@ import { chatModel } from "./chatModel";
 import { completeStoreRetriever } from "./vectorStores";
 
 // Create the retrieval chain
-export async function createRAGChain(paperId?: number) {
+export async function createRAGChain(paperId) {
   const combineDocsChain = await createStuffDocumentsChain({
     llm: chatModel,
     prompt: promptTemplate,

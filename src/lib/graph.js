@@ -2,26 +2,26 @@ import { dot, norm } from "mathjs";
 import path from "path";
 import fs from "fs";
 
+// ---- Step 1: Load Embeddings ----
 const dirPath = "../data/embeddingData.json";
 const filePath = path.join(process.cwd(), dirPath);
-
 const raw = fs.readFileSync(filePath, "utf-8");
 const data = JSON.parse(raw);
 console.log("Docs:", data.length);
 
-
+// ---- Step 2: Cosine Similarity ----
 function cosine_similarity(a, b) {
     const dot_product = dot(a, b);
     const normalization = norm(a) * norm(b);
     return dot_product / normalization;
 }
 
-function precompute_similarity(data, minThreshold) {
-    const storage = {};
-
-    for (let i = 0; i < data.length; i++) {
-        storage[data[i].id] = []; // init empty list of neighbors
-    }
+// ---- Step 3: Build Full Graph (All Pairwise Links Over Threshold) ----
+function compute_full_similarity_graph(data, minThreshold = 0.3) {
+    const graph = {
+        nodes: data.map(doc => ({ id: doc.id })),
+        links: []
+    };
 
     for (let i = 0; i < data.length; i++) {
         for (let j = i + 1; j < data.length; j++) {
@@ -31,19 +31,26 @@ function precompute_similarity(data, minThreshold) {
             const score = cosine_similarity(docA.embedding, docB.embedding);
 
             if (score >= minThreshold) {
-                storage[docA.id].push({ id: docB.id, similarity: score });
-                storage[docB.id].push({ id: docA.id, similarity: score }); // opposite direction
+                graph.links.push({
+                    source: docA.id,
+                    target: docB.id,
+                    similarity: score
+                });
             }
         }
     }
 
-    return storage;
+    return graph;
 }
 
-const result = precompute_similarity(data, 0.3);
-console.log(result);
+// ---- Step 4: Save to File ----
+function saveGraphToFile(graph, filename = "graph.json") {
+    const outputPath = path.join(process.cwd(), filename);
+    fs.writeFileSync(outputPath, JSON.stringify(graph, null, 2));
+    console.log("✅ Saved full graph to:", outputPath);
+}
 
-const emb1 = [-0.04, -0.03, 0.07];
-const emb2 = [-0.02, -0.01, 0.05];
-
-console.log("Test sim:", cosine_similarity(emb1, emb2));
+// ---- Step 5: Run ----
+const similarityThreshold = 0.3; // adjust as needed
+const fullGraph = compute_full_similarity_graph(data, similarityThreshold);
+saveGraphToFile(fullGraph);
