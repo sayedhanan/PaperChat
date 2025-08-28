@@ -202,13 +202,4 @@ EMBEDDING_MODEL=llama-text-embed-v2
 
 ## License
 
-MIT © Your Name
-
----
-
-If you want, I can also:
-
-* produce a ready-to-run `Populate.js` example that uses your `EmbeddingModel.js` and upserts in batches to Pinecone, or
-* convert `rag-core/Query.js` into a small CLI script you can run to test the `abstract` and `complete` namespaces interactively.
-
-Tell me which of those you'd like next.
+MIT © Sayed Hanan
